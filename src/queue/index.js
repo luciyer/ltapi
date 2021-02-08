@@ -47,7 +47,6 @@ jobQueue.on("error", (error) => {
 
 jobQueue.on("waiting", (jobId) => {
   console.log(`Job with ID ${jobId} is waiting.`)
-  sendUpdate(job, 'Job is waiting.', { jobId })
 });
 
 jobQueue.on("active", (job, jobPromise) => {
