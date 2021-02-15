@@ -91,6 +91,9 @@ exports.handleOauthCallback = async (req, res) => {
 
       const { api, auth, user } = req.session.salesforce
 
+      if (process.env.ENV_TYPE === 'development')
+        return res.redirect('/')
+
       res.redirect(process.env.FRONTEND_HOSTNAME + '/deploy')
 
     })

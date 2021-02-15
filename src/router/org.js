@@ -64,6 +64,17 @@ const getCurrentDataflowVersion = async (req, res) => {
 
 }
 
+const deleteDataflow = async (req, res) => {
+  try {
+    const conn = auth.refreshConnection(req.session)
+    const result = await org.deleteDataflow(conn, req.params.dataflow_id)
+    res.status(200).json(result)
+  } catch (e) {
+    console.error(e)
+    res.status(500).json(e.message)
+  }
+}
+
 const getOrgTemplates = async (req, res) => {
 
   try {
@@ -96,6 +107,19 @@ const deleteSingleOrgTemplate = async (req, res) => {
     const conn = auth.refreshConnection(req.session)
     const result = await org.deleteSingleTemplate(conn, req.params.template_id)
     res.status(200).json(result)
+  } catch (e) {
+    console.error(e)
+    res.status(500).json(e.message)
+  }
+
+}
+
+const downloadTemplate = async (req, res) => {
+  try {
+    const conn = auth.refreshConnection(req.session)
+    const stream = await org.downloadSingleTemplate(conn, req.body.template)
+    res.attachment(`${req.body.template}.zip`)
+    stream.pipe(res)
   } catch (e) {
     console.error(e)
     res.status(500).json(e.message)
@@ -169,9 +193,11 @@ module.exports = {
   getOrgDatasets: getOrgDatasets,
   getOrgDataflows: getOrgDataflows,
   getOrgTsDataflows: getOrgTsDataflows,
+  deleteDataflow: deleteDataflow,
   getCurrentDataflowVersion: getCurrentDataflowVersion,
   getOrgTemplates: getOrgTemplates,
   getSingleOrgTemplate: getSingleOrgTemplate,
+  downloadTemplate,
   deleteSingleOrgTemplate: deleteSingleOrgTemplate,
   createTemplateFromApp: createTemplateFromApp,
   updateTemplateFromApp: updateTemplateFromApp,

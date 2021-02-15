@@ -1,7 +1,7 @@
 /*
 
-Using Salesforce Private API rather than REST API, gather object records
-from the User's org.
+Using Salesforce Private API rather than REST API,
+gather object records from the User's org.
 
 */
 
@@ -47,21 +47,29 @@ exports.getSingleDataflow = async (conn, dataflow_id) => {
 
 }
 
-exports.getTsDataflows = (conn) => {
+exports.getTsDataflows = async (conn) => {
 
   console.log("Retrieving LTTS_TSDF Dataflows...")
 
-  return conn
+  const initialResults = await conn
     .sobject("Dataflow")
     .find({
-      DeveloperName : { $like : 'LTTS_TSDF%' },
-      // DeveloperName : { $not_like : 'LTTS_TSDF_PRIMER%' },
+      DeveloperName : { $like : 'LTTS_TSDF%' }
     })
+
+  const isPrimer = d => d.DeveloperName.includes('LTTS_TSDF_PRIMER')
+
+  return initialResults.filter(isPrimer)
 
 }
 
 exports.deleteDataflow = (conn, dataflowId) => {
 
+  console.log("Deleting Dataflow with ID", dataflowId)
+
+  return conn
+    .sobject("Dataflow")
+    .destroy(dataflowId)
 
 }
 
@@ -141,6 +149,10 @@ exports.getSingleTemplate = async (conn, template_id) => {
       }
     }
 
+}
+
+exports.downloadSingleTemplate = async (conn, metadataPackageName) => {
+  return await conn.metadata.retrieve({ packageNames: [ metadataPackageName ] }).stream()
 }
 
 exports.deleteSingleTemplate = (conn, template_id) => {

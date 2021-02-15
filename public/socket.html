@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<!-- TEST PAGE TO DISPLAY SOCKET MESSAGES FROM SERVER -->
+
+<html lang="en">
+	<head>
+		<title>Lowtide API</title>
+	</head>
+  <body>
+
+		<div class="">
+
+			<h3> Welcome to Lowtide :) </h3>
+			<p>
+				To use this page to debug socket messages, first you need to authenticate. Click "Launch Oauth" and upon return "Fetch Room."
+			</p>
+			<p> Or, use a REST client such as Postman or Insomnia to authenticate and inspect your session.
+				Extract the <span style="font-family:monospace;font-weight:bold;">socketRoomId</span> and paste it in the input below to subscribe and display messages.
+			</p>
+
+			<hr/>
+
+			<div class="">
+				<form>
+					<input id="launchOauthButton" type="submit" value="Launch Oauth" />
+					<input id="fetchRoomButton" type="submit" value="Fetch Room" />
+					<input id="socketRoom" type="text" placeholder="Room ID" />
+					<input id="submitButton" type="submit" value="Subscribe" />
+				</form>
+			</div>
+
+			<ul id="socketMessages"></ul>
+
+		</div>
+
+    <script
+			src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.5/socket.io.js"
+			integrity="sha512-2rUSTSAeOO02jF6eBqENNqPs1EohenJ5j+1dgDPdXSLz9nOlrr8DJk4zW/lDy8rjhGCSonW3Gx812XJQIKZKJQ=="
+			crossorigin="anonymous">
+		</script>
+
+    <script>
+
+			const socket = io.connect(),
+						submitButton = document.querySelector('#submitButton'),
+						launchOauthButton = document.querySelector('#launchOauthButton'),
+						socketRoomInput = document.querySelector('#socketRoom'),
+						fetchRoomButton = document.querySelector('#fetchRoomButton'),
+						messageList = document.querySelector('#socketMessages');
+
+			const displayMessage = function(update) {
+				console.log(update)
+				const listItem = document.createElement('li')
+				listItem.innerHTML = `${update.message}`
+				messageList.appendChild(listItem)
+			}
+
+			socket.on('jobUpdate', displayMessage)
+			socket.on('timeshiftUpdate', displayMessage)
+
+
+			launchOauthButton.addEventListener('click', function(e) {
+				e.preventDefault()
+				window.location.replace('http://localhost:8080/api/auth/oauth')
+			})
+
+			fetchRoomButton.addEventListener('click', async function(e) {
+				e.preventDefault()
+
+				const fetchResult = await fetch('/api/auth/session')
+
+				if (fetchResult.status === 403)
+					console.log('Not authenticated with a Salesforce instance.')
+				else if(fetchResult.status === 200) {
+					const resultBody = await fetchResult.json()
+					socketRoom.value = resultBody.socketRoom
+				}
+				else {
+					console.log('Fetch returned some other status...')
+					console.log(fetchResult)
+				}
+
+			})
+
+			submitButton.addEventListener('click', function(e) {
+				e.preventDefault()
+				const { value: inputValue } = document.querySelector('#socketRoom')
+				socket.emit('subscribeToJobUpdates', inputValue)
+				displayMessage({ message: 'Subscribed to ' + inputValue })
+			})
+
+    </script>
+  </body>
+</html>

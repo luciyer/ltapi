@@ -65,6 +65,10 @@ const clearFolder = (bucket, folder_key) => {
 
 }
 
+const streamDownload = async (template) => {
+  return getStream(config.awsConfig.bucket.name, template)
+}
+
 const getTemplateManifest = async (params) => {
 
   const { branch, org_api } = params
@@ -187,6 +191,7 @@ module.exports = {
   listBuckets: listBuckets,
   readBucket: readBucket,
   clearFolder: clearFolder,
+  streamDownload,
   getTemplateManifest: getTemplateManifest,
   downloadAndDeployTemplate: downloadAndDeployTemplate,
   uploadActivityLog: uploadActivityLog

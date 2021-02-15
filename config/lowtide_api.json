@@ -29,14 +29,14 @@
 
   "org_templates" : "/api/org/template",
   "org_template_single" : "/api/org/template/:template_id",
-  "org_template_download" : "/api/org/template/:template_id/download",
+  "org_template_download" : "/api/org/template/download",
   "org_template_upload" : "/api/org/template/upload",
 
   "repo" : "/api/repository/*",
 
   "repo_templates" : "/api/repository/template/:branch",
   "repo_template_deploy" : "/api/repository/template/:branch/deploy",
-  "repo_template_download" : "/api/repository/template/:branch/download",
+  "repo_template_download" : "/api/repository/template/download",
 
   "session_jobs": "/api/jobs/session/all"
 

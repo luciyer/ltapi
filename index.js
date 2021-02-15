@@ -67,6 +67,7 @@ app.route(config.ltApi("org_dataflows_folder"))
 
 app.route(config.ltApi("org_dataflow_single"))
   .get(router.org.getCurrentDataflowVersion)
+  .delete(router.org.deleteDataflow)
 
 app.route(config.ltApi("org_dataflows_run"))
   .get(router.org.runDataflow)
@@ -80,6 +81,9 @@ app.route(config.ltApi("org_template_single"))
   .get(router.org.getSingleOrgTemplate)
   .delete(router.org.deleteSingleOrgTemplate)
 
+app.route(config.ltApi("org_template_download"))
+  .post(router.org.downloadTemplate)
+
 app.route(config.ltApi("timeshift_array"))
   .post(router.timeshift.shiftDatasets)
 
@@ -91,7 +95,18 @@ app.route(config.ltApi("repo_templates"))
 app.route(config.ltApi("repo_template_deploy"))
   .post(router.repo.deployFromS3)
 
+app.route(config.ltApi("repo_template_download"))
+  .post(router.repo.downloadTemplate)
+
 /* ASYNC JOB QUEUE */
 
 app.route(config.ltApi("session_jobs"))
   .get(router.jobs.checkSessionJobs)
+
+/* Socket Messages Debug Page */
+
+if (process.env.ENV_TYPE === "development") {
+  app.route('/').get((req, res) => {
+    res.sendFile(__dirname + '/public/socket.html')
+  })
+}
